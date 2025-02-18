@@ -1,0 +1,16 @@
+# Ignorar el entorno virtual
+venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de logs y caché
+*.log
+logs/
+*.sqlite3
+
+# Configuración de IDEs
+.vscode/
+.idea/
