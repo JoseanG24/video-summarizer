@@ -18,13 +18,16 @@ const MainPage = () => {
       setLoading(true);
       setSummary(""); // Limpiar el resumen antes de hacer la solicitud
 
-      const response = await fetch("http://localhost:8080/api/summarize", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ videoUrl: videoLink }),
-      });
+      const response = await fetch(
+        "https://web-production-8432.up.railway.app/api/summarize",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ videoUrl: videoLink }),
+        }
+      );
 
       const data = await response.json();
 
