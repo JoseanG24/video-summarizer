@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 
 // Función para extraer el ID del video desde un enlace de YouTube
 function extractVideoId(url: string): string | null {
@@ -8,41 +8,37 @@ function extractVideoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+// ✅ Cambiamos "handler" por "GET" para cumplir con Next.js 15
+export async function GET(req: NextRequest) {
   try {
-    const { videoUrl } = req.query;
+    const { searchParams } = new URL(req.url);
+    const videoUrl = searchParams.get("videoUrl");
 
-    if (!videoUrl || typeof videoUrl !== "string") {
-      return res.status(400).json({ error: "Falta el enlace del video." });
+    if (!videoUrl) {
+      return NextResponse.json({ error: "Falta el enlace del video." }, { status: 400 });
     }
 
     const videoId = extractVideoId(videoUrl);
     if (!videoId) {
-      return res
-        .status(400)
-        .json({ error: "El enlace del video no es válido." });
+      return NextResponse.json({ error: "El enlace del video no es válido." }, { status: 400 });
     }
 
-    const apiKey = process.env.YOUTUBE_API_KEY; // Usa tu API Key de YouTube
+    const apiKey = process.env.YOUTUBE_API_KEY; // Asegúrate de que esta variable está en tu .env
     const url = `https://www.googleapis.com/youtube/v3/captions?videoId=${videoId}&part=snippet&key=${apiKey}`;
 
     const response = await fetch(url);
     const data = await response.json();
 
     if (!data.items || data.items.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No hay subtítulos disponibles para este video." });
+      return NextResponse.json({ error: "No hay subtítulos disponibles para este video." }, { status: 404 });
     }
 
     // Extraer el ID de los subtítulos
     const captionId = data.items[0].id;
-    res.status(200).json({ captionId });
+    return NextResponse.json({ captionId }, { status: 200 });
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error al obtener los subtítulos." });
+    return NextResponse.json({ error: "Error al obtener los subtítulos." }, { status: 500 });
   }
 }
