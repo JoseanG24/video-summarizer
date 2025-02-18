@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js" // Prisma genera el cliente para interactuar con la base de datos en JavaScript/TypeScript.
+}
+
+datasource db {
+  provider = "postgresql" // Se usa PostgreSQL como base de datos.
+  url      = env("DATABASE_URL") // La conexión se obtiene de una variable de entorno.
+}
+
+enum Role {
+  ADMIN // Usuario con permisos administrativos.
+  USER  // Usuario estándar.
+}
+
+/// **Usuarios registrados en la plataforma.**
+/// Cada usuario puede tener un historial de videos vistos o resumidos.
+model User {
+  id          String      @id @default(uuid()) @map("_id") // Identificador único del usuario.
+  email       String      @unique // Correo electrónico del usuario.
+  firstName   String?     // Nombre del usuario (opcional).
+  lastName    String?     // Apellido del usuario (opcional).
+  imageUrl    String?     // Imagen de perfil del usuario (opcional).
+  clerkUserId String      @unique // ID único del usuario en Clerk (si se usa autenticación con Clerk).
+  createdAt   DateTime    @default(now()) // Fecha de registro del usuario.
+  updatedAt   DateTime    @updatedAt // Fecha de última actualización automática.
+
+  videos      UserVideo[] // Relación con los videos vistos por el usuario.
+}
+
+/// **Videos extraídos de YouTube.**
+/// Contiene la información de cada video para evitar hacer múltiples solicitudes a la API de YouTube.
+model Video {
+  id          String      @id @default(uuid()) @map("_id") // ID único del video en la base de datos.
+  youtubeId   String      @unique // ID del video en YouTube (ejemplo: "dQw4w9WgXcQ").
+  title       String      // Título del video.
+  description String?     // Descripción del video (opcional).
+  channel     String      // Nombre del canal de YouTube.
+  thumbnail   String?     // Miniatura del video (opcional).
+  duration    Int?        // Duración en segundos (opcional).
+  createdAt   DateTime    @default(now()) // Fecha en que el video fue agregado a la base de datos.
+
+  transcripts Transcript[] // Relación con las transcripciones del video.
+  summaries   Summary[]    // Relación con los resúmenes del video.
+  users       UserVideo[]  // Relación con los usuarios que han visto este video.
+}
+
+/// **Transcripción de los videos.**
+/// Se obtiene de la API de YouTube si está disponible o se genera con Whisper.
+model Transcript {
+  id         String   @id @default(uuid()) @map("_id") // Identificador único de la transcripción.
+  videoId    String   @unique // Relación con el video al que pertenece.
+  video      Video    @relation(fields: [videoId], references: [id]) // Relación con el modelo `Video`.
+  text       String   // Texto completo de la transcripción.
+  language   String   // Idioma de la transcripción (ejemplo: "es", "en").
+  createdAt  DateTime @default(now()) // Fecha en que se generó la transcripción.
+}
+
+/// **Resumen generado a partir de la transcripción de un video.**
+/// Se obtiene utilizando un modelo de IA como OpenAI GPT-4.
+model Summary {
+  id         String   @id @default(uuid()) @map("_id") // Identificador único del resumen.
+  videoId    String   @unique // Relación con el video al que pertenece.
+  video      Video    @relation(fields: [videoId], references: [id]) // Relación con el modelo `Video`.
+  summary    String   // Texto del resumen generado.
+  createdAt  DateTime @default(now()) // Fecha en que se creó el resumen.
+}
+
+/// **Historial de videos vistos por cada usuario.**
+/// Relación "muchos a muchos" entre `User` y `Video` para rastrear qué videos han sido vistos por cada usuario.
+model UserVideo {
+  id        String   @id @default(uuid()) @map("_id") // Identificador único de la relación.
+  userId    String // ID del usuario que vio el video.
+  videoId   String // ID del video visto por el usuario.
+  createdAt DateTime @default(now()) // Fecha en que el usuario vio el video.
+
+  user  User  @relation(fields: [userId], references: [id]) // Relación con el usuario.
+  video Video @relation(fields: [videoId], references: [id]) // Relación con el video.
+
+  @@unique([userId, videoId]) // Un usuario solo puede tener un mismo video una vez en su historial.
+}
