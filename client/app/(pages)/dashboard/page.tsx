@@ -19,7 +19,8 @@ const MainPage = () => {
       setSummary(""); // Limpiar el resumen antes de hacer la solicitud
 
       const response = await fetch(
-        "https://web-production-8432.up.railway.app/api/summarize",
+        // "https://web-production-8432.up.railway.app/api/summarize",
+        "http://localhost:8080/api/summarize",
         {
           method: "POST",
           headers: {

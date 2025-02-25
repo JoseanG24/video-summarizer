@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 export default function PagesLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) { 
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <main className="h-screen">
       <DarkRedNav />

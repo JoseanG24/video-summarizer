@@ -10,7 +10,7 @@ import tempfile
 load_dotenv()
 
 # Crear cliente de OpenAI
-client = OpenAI()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Configurar Flask
 app = Flask(__name__)
@@ -28,9 +28,9 @@ def download_audio(video_url):
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',  # Asegura conversión a MP3
-                'preferredquality': '192',
+                'preferredquality': '64',
             }],
-            # 'ffmpeg_location': r'C:\ffmpeg-2025-02-13-git-19a2d26177-full_build\bin\ffmpeg.exe',
+            'ffmpeg_location': r'C:\ffmpeg-2025-02-13-git-19a2d26177-full_build\bin\ffmpeg.exe',
             'outtmpl': f"{audio_path}.%(ext)s"  # Asegura que yt-dlp maneje bien el nombre del archivo
         }
 
@@ -53,11 +53,14 @@ def transcribe_audio(audio_path):
                 response_format="text"
             )
 
-        return transcription.text
+        print("Respuesta de OpenAI:", transcription)  # 🔹 Agregar este print para ver la respuesta real
+
+        return transcription if isinstance(transcription, str) else transcription.text
 
     except Exception as e:
         print(f"Error en la transcripción del audio: {e}")
         return None
+
 
 @app.route("/api/summarize", methods=["POST"])
 def summarize_video():
@@ -92,4 +95,5 @@ def summarize_video():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(debug=True, host="0.0.0.0", port=port)
