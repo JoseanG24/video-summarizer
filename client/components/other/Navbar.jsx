@@ -29,10 +29,10 @@ const NavOverlay = ({ setActive }) => {
     >
       <motion.button
         onClick={() => setActive(false)}
-        className="absolute top-6 right-6 text-3xl bg-red-600 text-white hover:bg-red-700 p-4 rounded-full transition-all"
+        className="absolute top-6 right-6 text-3xl bg-red-600 text-white hover:bg-red-700 p-6 rounded-full transition-all"
         whileHover={{ rotate: "180deg" }}
       >
-        <FiX />
+        <FiX size={32} />
       </motion.button>
 
       <motion.div className="space-y-6 text-center">
@@ -93,11 +93,11 @@ const SocialLinks = () => {
 const HamburgerButton = ({ active, setActive }) => {
   return (
     <motion.button
-      className="fixed top-6 right-6 z-50 p-4 rounded-full bg-red-600 text-white hover:bg-red-700 transition-all"
+      className="fixed top-6 right-6 z-50 p-6 rounded-full bg-red-600 text-white hover:bg-red-700 transition-all"
       onClick={() => setActive((prev) => !prev)}
       whileTap={{ scale: 0.9 }}
     >
-      {active ? <FiX size={24} /> : <FiMenu size={24} />}
+      {active ? <FiX size={32} /> : <FiMenu size={32} />}
     </motion.button>
   );
 };
