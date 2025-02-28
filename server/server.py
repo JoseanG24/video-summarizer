@@ -7,13 +7,17 @@ from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, No
 from urllib.parse import urlparse, parse_qs
 import subprocess
 
+# Usa la ruta de FFmpeg según el entorno
 FFMPEG_PATH = os.getenv("FFMPEG_PATH", "/usr/bin/ffmpeg")
 
+# Verificar si FFmpeg está instalado
 try:
     subprocess.run([FFMPEG_PATH, "-version"], check=True)
-    print("✅ FFmpeg está instalado correctamente")
+    print(f"✅ FFmpeg está instalado correctamente en {FFMPEG_PATH}")
 except FileNotFoundError:
-    print("❌ FFmpeg no está instalado. Intenta instalarlo en Railway")
+    print("❌ FFmpeg no está instalado. Railway necesita que lo instales.")
+
+
 
 app = Flask(__name__)
 CORS(app)
