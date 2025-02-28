@@ -23,9 +23,9 @@ export const POST = async (request: NextRequest) => {
           role: "system",
           content: `Summarize the following YouTube video transcript. Extract the most important ideas and key details. 
             
-            - Keep the summary between 100-150 words.
+         
             - Ensure clarity and logical flow.
-            - Remove unnecessary details, but retain the core message.
+  
             
             Here is the transcript: ${transcription}`,
         },
