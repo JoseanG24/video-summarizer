@@ -5,6 +5,15 @@ import transcribe
 import requests
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 from urllib.parse import urlparse, parse_qs
+import subprocess
+
+FFMPEG_PATH = os.getenv("FFMPEG_PATH", "/usr/bin/ffmpeg")
+
+try:
+    subprocess.run([FFMPEG_PATH, "-version"], check=True)
+    print("✅ FFmpeg está instalado correctamente")
+except FileNotFoundError:
+    print("❌ FFmpeg no está instalado. Intenta instalarlo en Railway")
 
 app = Flask(__name__)
 CORS(app)
