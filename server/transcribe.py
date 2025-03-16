@@ -12,7 +12,7 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def download_audio(video_url):
-    """Descarga el audio en un archivo temporal y lo convierte a MP3."""
+    # Descarga el audio en un archivo temporal y lo convierte a MP3.
     try:
         temp_audio = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
         audio_path = temp_audio.name  # Ruta del archivo temporal
@@ -25,7 +25,11 @@ def download_audio(video_url):
                 'preferredcodec': 'mp3',  # Conversión a MP3
                 'preferredquality': '64',
             }],
-            'ffmpeg_location': r'C:\ffmpeg-2025-02-13-git-19a2d26177-full_build\bin\ffmpeg.exe',
+            # USAR EN DESARROLLO
+            # 'ffmpeg_location': r'C:\ffmpeg-2025-02-13-git-19a2d26177-full_build\bin\ffmpeg.exe',
+            #---------------------------------------------------------------------
+            # USAR EN PRODUCCIÓN
+            'ffmpeg_location': os.getenv("FFMPEG_PATH", "/usr/bin/ffmpeg"),
             'outtmpl': f"{audio_path}.%(ext)s"
         }
 

@@ -23,7 +23,10 @@ const MainPage = () => {
       setSummary("");
 
       const response = await fetch(
+        // Usar en desarrollo
         // "http://localhost:8080/api/summarize",
+// -----------------------------------------------------------------------------
+        // Usar en producción
         "https://web-production-8432.up.railway.app/api/summarize",
         {
           method: "POST",
