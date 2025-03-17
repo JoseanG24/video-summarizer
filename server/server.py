@@ -5,6 +5,19 @@ import transcribe
 import requests
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 from urllib.parse import urlparse, parse_qs
+import subprocess
+
+# Usa la ruta de FFmpeg según el entorno
+FFMPEG_PATH = os.getenv("FFMPEG_PATH", "/usr/bin/ffmpeg")
+
+# Verificar si FFmpeg está instalado
+try:
+    subprocess.run([FFMPEG_PATH, "-version"], check=True)
+    print(f"✅ FFmpeg está instalado correctamente en {FFMPEG_PATH}")
+except FileNotFoundError:
+    print("❌ FFmpeg no está instalado. Railway necesita que lo instales.")
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -53,9 +66,8 @@ def summarize_video():
             return jsonify({"error": "El video es privado o ha sido eliminado"}), 400
 
         audio_path = transcribe.download_audio(video_url)
-        if not audio_path or not os.path.exists(audio_path):
-            return jsonify({"error": "Error al descargar o encontrar el audio"}), 500
-
+        if not audio_path:
+            return jsonify({"error": "Error al descargar el audio"}), 500
 
         transcription = transcribe.transcribe_audio(audio_path)
         os.remove(audio_path)
