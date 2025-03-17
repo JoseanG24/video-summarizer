@@ -5,16 +5,30 @@ apt-get update && apt-get install -y ffmpeg libavcodec-extra
 
 echo "✅ Instalación completada."
 
-# Mostrar ruta de ffmpeg
+# Verificar si ffmpeg y ffprobe están instalados
 echo "🔍 Verificando instalación de FFmpeg y ffprobe..."
-which ffmpeg || echo "❌ ffmpeg no encontrado"
-which ffprobe || echo "❌ ffprobe no encontrado"
-ls -l /usr/bin/ffmpeg || echo "❌ /usr/bin/ffmpeg no existe"
-ls -l /usr/bin/ffprobe || echo "❌ /usr/bin/ffprobe no existe"
+FFMPEG_PATH=$(which ffmpeg)
+FFPROBE_PATH=$(which ffprobe)
+
+if [ -x "$FFMPEG_PATH" ]; then
+    echo "✅ FFmpeg encontrado en: $FFMPEG_PATH"
+else
+    echo "❌ FFmpeg NO encontrado. Verifica la instalación en Railway."
+fi
+
+if [ -x "$FFPROBE_PATH" ]; then
+    echo "✅ FFprobe encontrado en: $FFPROBE_PATH"
+else
+    echo "❌ FFprobe NO encontrado. Verifica la instalación en Railway."
+fi
+
+# Exportar rutas para que yt-dlp las use
+export FFMPEG_PATH="$FFMPEG_PATH"
+export FFPROBE_PATH="$FFPROBE_PATH"
 
 # Intentar ejecutar ffmpeg antes de iniciar el servidor
 echo "🔍 Ejecutando ffmpeg para verificar que funciona..."
-ffmpeg -hide_banner -loglevel panic -version || echo "❌ ffmpeg no se pudo ejecutar"
+ffmpeg -version || echo "❌ No se puede ejecutar ffmpeg"
 
 echo "🚀 Iniciando el servidor..."
 python server.py
