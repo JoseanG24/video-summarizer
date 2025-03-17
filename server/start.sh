@@ -7,11 +7,15 @@ echo "✅ Instalación completada."
 
 # Verificar si ffmpeg y ffprobe están correctamente instalados
 echo "🔍 Verificando instalación de FFmpeg y ffprobe..."
-which ffmpeg
-which ffprobe
-ls -l /usr/bin/ffmpeg
-ls -l /usr/bin/ffprobe
-ffmpeg -version
+which ffmpeg || echo "❌ ffmpeg no encontrado"
+which ffprobe || echo "❌ ffprobe no encontrado"
+ls -l /usr/bin/ffmpeg || echo "❌ /usr/bin/ffmpeg no existe"
+ls -l /usr/bin/ffprobe || echo "❌ /usr/bin/ffprobe no existe"
+ffmpeg -version || echo "❌ No se puede ejecutar ffmpeg"
+
+# Intentar ejecutar ffmpeg antes de iniciar el servidor
+echo "🔍 Ejecutando ffmpeg para verificar que funciona..."
+ffmpeg -hide_banner -loglevel panic -version || echo "❌ ffmpeg no se pudo ejecutar"
 
 echo "🚀 Iniciando el servidor..."
 python server.py

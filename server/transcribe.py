@@ -4,16 +4,23 @@ import tempfile
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# Cargar variables de entorno desde Railway
+# Cargar variables de entorno
 load_dotenv()
 
-# Verificar la ruta de ffmpeg desde la variable de entorno
+# Buscar ffmpeg en diferentes ubicaciones
 FFMPEG_PATH = os.getenv("FFMPEG_PATH", "/usr/bin/ffmpeg")
 
 if not os.path.exists(FFMPEG_PATH):
-    print(f"❌ ffmpeg NO encontrado en {FFMPEG_PATH}. Verifica la instalación en Railway.")
-else:
+    FFMPEG_PATH = "/usr/local/bin/ffmpeg"
+if not os.path.exists(FFMPEG_PATH):
+    FFMPEG_PATH = "/bin/ffmpeg"
+if not os.path.exists(FFMPEG_PATH):
+    FFMPEG_PATH = "/opt/homebrew/bin/ffmpeg"
+
+if os.path.exists(FFMPEG_PATH):
     print(f"✅ ffmpeg encontrado en {FFMPEG_PATH}")
+else:
+    print("❌ ffmpeg NO encontrado. Verifica su instalación en Railway.")
 
 # Crear cliente de OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -32,11 +39,11 @@ def download_audio(video_url):
                 'preferredcodec': 'mp3',
                 'preferredquality': '64',
             }],
-             # USAR EN DESARROLLO
+            # USAR EN DESARROLLO
             # 'ffmpeg_location': r'C:\ffmpeg-2025-02-13-git-19a2d26177-full_build\bin\ffmpeg.exe',
             #---------------------------------------------------------------------
             # USAR EN PRODUCCIÓN
-            'ffmpeg_location': FFMPEG_PATH,  # Asegurar que usa la variable de entorno
+            'ffmpeg_location': FFMPEG_PATH,
             'noplaylist': True,
             'outtmpl': f"{audio_path}.%(ext)s"
         }
